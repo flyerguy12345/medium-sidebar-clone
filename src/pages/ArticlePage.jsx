@@ -1,4 +1,4 @@
-import { ArrowLeft, Heart, MessageCircle } from 'lucide-react'
+import { ArrowLeft, Gem, Heart, MessageCircle } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { STORIES } from '../data/searchIndex'
 import { ARTICLE_CONTENT } from '../data/articleContent'
@@ -55,6 +55,13 @@ export default function ArticlePage() {
       </Link>
 
       <header className="flex flex-col gap-3">
+        {story.isMemberOnly && (
+          <span className="flex w-fit items-center gap-1.5 text-xs font-semibold text-amber-600">
+            <Gem size={14} className="fill-amber-400 text-amber-500" />
+            Member-only story
+          </span>
+        )}
+
         {story.tags && (
           <div className="flex flex-wrap gap-2">
             {story.tags.map((tag) => (

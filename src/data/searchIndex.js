@@ -20,6 +20,7 @@ export const STORIES = [
     publication: 'No Time',
     readTime: '10 min read',
     date: 'Sep 2, 2026',
+    isMemberOnly: true,
     excerpt:
       "OpenClaw's new installer starts by going through your own computer looking for AI access you already have. A signed-in Claude or ChatGPT account. An API key sitting in your environment. An Ollama or LM Studio model you downloaded two months ago and forgot about.",
     tags: ['AI', 'Openclaw', 'AI Agent', 'Technology', 'Automation'],

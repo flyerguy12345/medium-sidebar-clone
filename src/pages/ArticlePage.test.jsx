@@ -40,6 +40,21 @@ describe('ArticlePage', () => {
     expect(screen.getByText(/full article isn't available yet/i)).toBeInTheDocument()
   })
 
+  it('shows the Member-only story badge and tag pills for a member-only article', () => {
+    renderArticlePage('openclaw-2-0')
+
+    expect(screen.getByText('Member-only story')).toBeInTheDocument()
+    ;['AI', 'Openclaw', 'AI Agent', 'Technology', 'Automation'].forEach((tag) => {
+      expect(screen.getByText(tag)).toBeInTheDocument()
+    })
+  })
+
+  it('does not show the Member-only badge for articles that are not member-only', () => {
+    renderArticlePage('react-hooks-2026')
+
+    expect(screen.queryByText('Member-only story')).not.toBeInTheDocument()
+  })
+
   it('shows a not-found state for an unknown article id', () => {
     renderArticlePage('does-not-exist')
 
