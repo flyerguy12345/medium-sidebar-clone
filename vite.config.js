@@ -4,6 +4,7 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/medium-sidebar-clone/',
   plugins: [react(), tailwindcss()],
   test: {
     environment: 'jsdom',
