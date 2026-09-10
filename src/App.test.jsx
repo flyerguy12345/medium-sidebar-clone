@@ -94,4 +94,27 @@ describe('App routing', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: 'Write a story' })).toBeInTheDocument()
   })
+
+  it('navigates from the home feed to an article and back', async () => {
+    const user = userEvent.setup()
+    renderApp('/')
+
+    await user.click(
+      screen.getByRole('heading', {
+        level: 2,
+        name: 'OpenClaw 2.0 Just Dropped and It Is a Massive Upgrade',
+      }),
+    )
+
+    expect(
+      screen.getByRole('heading', {
+        level: 1,
+        name: 'OpenClaw 2.0 Just Dropped and It Is a Massive Upgrade',
+      }),
+    ).toBeInTheDocument()
+
+    await user.click(screen.getByRole('link', { name: /back to home/i }))
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Home' })).toBeInTheDocument()
+  })
 })

@@ -10,6 +10,7 @@ import StatsPage from './pages/StatsPage'
 import FollowingPage from './pages/FollowingPage'
 import SearchPage from './pages/SearchPage'
 import WritePage from './pages/WritePage'
+import ArticlePage from './pages/ArticlePage'
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -41,6 +42,7 @@ function App() {
             <Route path="/following" element={<FollowingPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/write" element={<WritePage />} />
+            <Route path="/article/:id" element={<ArticlePage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
