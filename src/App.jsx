@@ -1,6 +1,13 @@
 import { useState } from 'react'
 import { Menu } from 'lucide-react'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
+import HomePage from './pages/HomePage'
+import LibraryPage from './pages/LibraryPage'
+import ProfilePage from './pages/ProfilePage'
+import StoriesPage from './pages/StoriesPage'
+import StatsPage from './pages/StatsPage'
+import FollowingPage from './pages/FollowingPage'
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -22,8 +29,16 @@ function App() {
           <span className="font-medium text-gray-900">Medium</span>
         </header>
 
-        <main className="flex flex-1 items-center justify-center text-gray-400">
-          <p>Main content goes here</p>
+        <main className="flex-1 overflow-y-auto">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/library" element={<LibraryPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/stories" element={<StoriesPage />} />
+            <Route path="/stats" element={<StatsPage />} />
+            <Route path="/following" element={<FollowingPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </main>
       </div>
     </div>

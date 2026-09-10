@@ -11,14 +11,15 @@ import {
   X,
 } from 'lucide-react'
 import { useState } from 'react'
+import { NavLink } from 'react-router-dom'
 
 const NAV_ITEMS = [
-  { label: 'Home', icon: Home },
-  { label: 'Library', icon: BookMarked },
-  { label: 'Profile', icon: User },
-  { label: 'Stories', icon: Newspaper },
-  { label: 'Stats', icon: BarChart2 },
-  { label: 'Following', icon: Users },
+  { label: 'Home', path: '/', icon: Home, end: true },
+  { label: 'Library', path: '/library', icon: BookMarked },
+  { label: 'Profile', path: '/profile', icon: User },
+  { label: 'Stories', path: '/stories', icon: Newspaper },
+  { label: 'Stats', path: '/stats', icon: BarChart2 },
+  { label: 'Following', path: '/following', icon: Users },
 ]
 
 const FOLLOWING = [
@@ -72,7 +73,6 @@ function Avatar({ name, index }) {
 
 export default function Sidebar({
   userName = 'Dan Dickinson',
-  activeItem = 'Home',
   isOpen = false,
   onClose = () => {},
 }) {
@@ -133,24 +133,24 @@ export default function Sidebar({
 
         {/* Nav */}
         <nav className="flex flex-col px-2">
-          {NAV_ITEMS.map(({ label, icon: Icon }) => {
-            const isActive = label === activeItem
-            return (
-              <a
-                key={label}
-                href={`#${label.toLowerCase()}`}
-                onClick={onClose}
-                className={`flex items-center gap-3 rounded-md px-3 py-2 transition-colors ${
+          {NAV_ITEMS.map(({ label, path, icon: Icon, end }) => (
+            <NavLink
+              key={label}
+              to={path}
+              end={end}
+              onClick={onClose}
+              className={({ isActive }) =>
+                `flex items-center gap-3 rounded-md px-3 py-2 transition-colors ${
                   isActive
-                    ? 'font-medium text-gray-900'
+                    ? 'bg-gray-100 font-medium text-gray-900'
                     : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                <Icon size={18} />
-                <span>{label}</span>
-              </a>
-            )
-          })}
+                }`
+              }
+            >
+              <Icon size={18} />
+              <span>{label}</span>
+            </NavLink>
+          ))}
         </nav>
 
         <div className="mx-5 my-3 border-t border-gray-200" />
