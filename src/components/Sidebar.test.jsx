@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import Sidebar from './Sidebar'
@@ -55,11 +55,74 @@ describe('Sidebar', () => {
     expect(onClose).toHaveBeenCalledTimes(1)
   })
 
-  it('renders the write and notifications actions', () => {
+  it('renders the write link and notifications button', () => {
     renderSidebar()
 
-    expect(screen.getByRole('button', { name: /write/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /notifications/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /write/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^notifications$/i })).toBeInTheDocument()
+  })
+
+  it('navigates to /write and closes on mobile when the write link is clicked', async () => {
+    const onClose = vi.fn()
+    const user = userEvent.setup()
+    renderSidebar({ onClose })
+
+    await user.click(screen.getByRole('link', { name: /write/i }))
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('shows an unread count badge and toggles the notifications panel', async () => {
+    const user = userEvent.setup()
+    renderSidebar()
+
+    const bellButton = screen.getByRole('button', { name: /^notifications$/i })
+    expect(within(bellButton).getByText('2')).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: /notifications/i })).not.toBeInTheDocument()
+
+    await user.click(bellButton)
+
+    expect(screen.getByRole('region', { name: /notifications/i })).toBeInTheDocument()
+    expect(screen.getByText('MLGuy started following you')).toBeInTheDocument()
+
+    await user.click(bellButton)
+
+    expect(screen.queryByRole('region', { name: /notifications/i })).not.toBeInTheDocument()
+  })
+
+  it('marks a single notification as read when clicked', async () => {
+    const user = userEvent.setup()
+    renderSidebar()
+
+    await user.click(screen.getByRole('button', { name: /^notifications$/i }))
+    await user.click(screen.getByText('MLGuy started following you'))
+
+    const bellButton = screen.getByRole('button', { name: /^notifications$/i })
+    expect(within(bellButton).getByText('1')).toBeInTheDocument()
+  })
+
+  it('marks all notifications as read and clears the badge', async () => {
+    const user = userEvent.setup()
+    renderSidebar()
+
+    await user.click(screen.getByRole('button', { name: /^notifications$/i }))
+    await user.click(screen.getByRole('button', { name: /mark all as read/i }))
+
+    expect(screen.queryByRole('button', { name: /mark all as read/i })).not.toBeInTheDocument()
+    const bellButton = screen.getByRole('button', { name: /^notifications$/i })
+    expect(within(bellButton).queryByText('2')).not.toBeInTheDocument()
+  })
+
+  it('closes the notifications panel when clicking outside', async () => {
+    const user = userEvent.setup()
+    renderSidebar()
+
+    await user.click(screen.getByRole('button', { name: /^notifications$/i }))
+    expect(screen.getByRole('region', { name: /notifications/i })).toBeInTheDocument()
+
+    await user.click(document.body)
+
+    expect(screen.queryByRole('region', { name: /notifications/i })).not.toBeInTheDocument()
   })
 
   it('shows the mobile backdrop only when open, and closes on backdrop click', async () => {

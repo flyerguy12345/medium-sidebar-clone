@@ -9,6 +9,7 @@ import StoriesPage from './pages/StoriesPage'
 import StatsPage from './pages/StatsPage'
 import FollowingPage from './pages/FollowingPage'
 import SearchPage from './pages/SearchPage'
+import WritePage from './pages/WritePage'
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
@@ -39,6 +40,7 @@ function App() {
             <Route path="/stats" element={<StatsPage />} />
             <Route path="/following" element={<FollowingPage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/write" element={<WritePage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>

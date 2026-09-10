@@ -11,7 +11,7 @@ import {
   Search,
   X,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { PUBLICATIONS as FOLLOWING } from '../data/searchIndex'
 
@@ -22,6 +22,12 @@ const NAV_ITEMS = [
   { label: 'Stories', path: '/stories', icon: Newspaper },
   { label: 'Stats', path: '/stats', icon: BarChart2 },
   { label: 'Following', path: '/following', icon: Users },
+]
+
+const INITIAL_NOTIFICATIONS = [
+  { id: 1, title: 'MLGuy started following you', time: '2h ago', read: false },
+  { id: 2, title: 'Your story was mentioned in Generative AI', time: '5h ago', read: false },
+  { id: 3, title: 'Towards AI published a new story you might like', time: '1d ago', read: true },
 ]
 
 const FOOTER_LINKS = [
@@ -67,8 +73,12 @@ export default function Sidebar({
 }) {
   const [showAllFollowing, setShowAllFollowing] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS)
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false)
   const visibleFollowing = showAllFollowing ? FOLLOWING : FOLLOWING.slice(0, 6)
   const navigate = useNavigate()
+  const notificationsRef = useRef(null)
+  const unreadCount = notifications.filter((notification) => !notification.read).length
 
   const handleSearchSubmit = (event) => {
     event.preventDefault()
@@ -77,6 +87,31 @@ export default function Sidebar({
     navigate(`/search?q=${encodeURIComponent(trimmed)}`)
     onClose()
   }
+
+  const markAllAsRead = () => {
+    setNotifications((prev) => prev.map((notification) => ({ ...notification, read: true })))
+  }
+
+  const markAsRead = (id) => {
+    setNotifications((prev) =>
+      prev.map((notification) =>
+        notification.id === id ? { ...notification, read: true } : notification,
+      ),
+    )
+  }
+
+  useEffect(() => {
+    if (!isNotificationsOpen) return undefined
+
+    function handleClickOutside(event) {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target)) {
+        setIsNotificationsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [isNotificationsOpen])
 
   return (
     <>
@@ -114,21 +149,89 @@ export default function Sidebar({
 
         {/* Top actions */}
         <div className="flex items-center justify-between px-5 pt-4 pb-2">
-          <button
-            type="button"
-            className="flex items-center gap-2 text-gray-500 transition-colors hover:text-gray-900"
+          <NavLink
+            to="/write"
+            onClick={onClose}
+            className={({ isActive }) =>
+              `flex items-center gap-2 transition-colors ${
+                isActive ? 'font-medium text-gray-900' : 'text-gray-500 hover:text-gray-900'
+              }`
+            }
           >
             <PenSquare size={18} />
             <span>Write</span>
-          </button>
+          </NavLink>
           <div className="flex items-center gap-1">
-            <button
-              type="button"
-              aria-label="Notifications"
-              className="rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
-            >
-              <Bell size={18} />
-            </button>
+            <div className="relative" ref={notificationsRef}>
+              <button
+                type="button"
+                aria-label="Notifications"
+                aria-haspopup="true"
+                aria-expanded={isNotificationsOpen}
+                onClick={() => setIsNotificationsOpen((prev) => !prev)}
+                className="relative rounded-full p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-900"
+              >
+                <Bell size={18} />
+                {unreadCount > 0 && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white"
+                  >
+                    {unreadCount}
+                  </span>
+                )}
+              </button>
+
+              {isNotificationsOpen && (
+                <div
+                  role="region"
+                  aria-label="Notifications"
+                  className="absolute right-0 top-full z-50 mt-2 w-72 rounded-lg border border-gray-200 bg-white p-2 shadow-lg"
+                >
+                  <div className="flex items-center justify-between px-2 py-1">
+                    <span className="text-sm font-semibold text-gray-900">Notifications</span>
+                    {unreadCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={markAllAsRead}
+                        className="text-xs font-medium text-gray-500 hover:text-gray-900"
+                      >
+                        Mark all as read
+                      </button>
+                    )}
+                  </div>
+
+                  {notifications.length === 0 ? (
+                    <p className="px-2 py-4 text-sm text-gray-500">You're all caught up.</p>
+                  ) : (
+                    <ul className="mt-1 flex flex-col">
+                      {notifications.map((notification) => (
+                        <li key={notification.id}>
+                          <button
+                            type="button"
+                            onClick={() => markAsRead(notification.id)}
+                            className={`flex w-full flex-col items-start gap-0.5 rounded-md px-2 py-2 text-left transition-colors hover:bg-gray-50 ${
+                              notification.read ? 'text-gray-500' : 'text-gray-900'
+                            }`}
+                          >
+                            <span className="flex items-center gap-2 text-sm">
+                              {!notification.read && (
+                                <span
+                                  aria-hidden="true"
+                                  className="h-1.5 w-1.5 shrink-0 rounded-full bg-sky-500"
+                                />
+                              )}
+                              {notification.title}
+                            </span>
+                            <span className="text-xs text-gray-400">{notification.time}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
+            </div>
             <button
               type="button"
               onClick={onClose}

@@ -85,4 +85,13 @@ describe('App routing', () => {
       screen.getByRole('heading', { level: 1, name: 'Results for "react hooks"' }),
     ).toBeInTheDocument()
   })
+
+  it('navigates to the write page when the sidebar write link is clicked', async () => {
+    const user = userEvent.setup()
+    renderApp('/')
+
+    await user.click(screen.getByRole('link', { name: /write/i }))
+
+    expect(screen.getByRole('heading', { level: 1, name: 'Write a story' })).toBeInTheDocument()
+  })
 })
