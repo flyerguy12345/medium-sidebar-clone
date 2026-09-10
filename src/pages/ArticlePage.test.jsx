@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import ArticlePage from './ArticlePage'
 
@@ -65,5 +66,33 @@ describe('ArticlePage', () => {
     renderArticlePage('openclaw-2-0')
 
     expect(screen.getByRole('link', { name: /back to home/i })).toHaveAttribute('href', '/')
+  })
+
+  it('shows an author profile section with a Follow button', () => {
+    renderArticlePage('openclaw-2-0')
+
+    expect(screen.getByText('Written by Pranit naik')).toBeInTheDocument()
+    expect(screen.getByText('No Time')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^Follow$/ })).toBeInTheDocument()
+  })
+
+  it('toggles the Follow button to Following and back when clicked', async () => {
+    const user = userEvent.setup()
+    renderArticlePage('openclaw-2-0')
+
+    const followButton = screen.getByRole('button', { name: /^Follow$/ })
+    expect(followButton).toHaveAttribute('aria-pressed', 'false')
+
+    await user.click(followButton)
+
+    const followingButton = screen.getByRole('button', { name: /^Following$/ })
+    expect(followingButton).toHaveAttribute('aria-pressed', 'true')
+
+    await user.click(followingButton)
+
+    expect(screen.getByRole('button', { name: /^Follow$/ })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
   })
 })

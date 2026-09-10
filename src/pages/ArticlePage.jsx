@@ -1,4 +1,5 @@
 import { ArrowLeft, Gem, Heart, MessageCircle } from 'lucide-react'
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { STORIES } from '../data/searchIndex'
 import { ARTICLE_CONTENT } from '../data/articleContent'
@@ -32,6 +33,17 @@ function ArticleSection({ heading, paragraphs = [], list, trailingParagraphs = [
 export default function ArticlePage() {
   const { id } = useParams()
   const story = STORIES.find((item) => item.id === id)
+  const [isFollowingAuthor, setIsFollowingAuthor] = useState(false)
+
+  // Reset the follow toggle when navigating between articles, since this
+  // component instance is reused across /article/:id route changes. This
+  // adjusts state during render rather than in an effect, per React's
+  // guidance for resetting state when a prop changes.
+  const [renderedId, setRenderedId] = useState(id)
+  if (renderedId !== id) {
+    setRenderedId(id)
+    setIsFollowingAuthor(false)
+  }
 
   if (!story) {
     return (
@@ -113,6 +125,30 @@ export default function ArticlePage() {
           </p>
         </div>
       )}
+
+      <div className="mt-4 flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
+        <div className="flex items-center gap-3">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gray-900 text-base font-semibold text-white">
+            {story.author.trim().charAt(0).toUpperCase()}
+          </span>
+          <div>
+            <p className="font-medium text-gray-900">Written by {story.author}</p>
+            <p className="text-sm text-gray-500">{story.publication}</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsFollowingAuthor((prev) => !prev)}
+          aria-pressed={isFollowingAuthor}
+          className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+            isFollowingAuthor
+              ? 'border border-gray-300 text-gray-700 hover:border-red-300 hover:text-red-600'
+              : 'bg-gray-900 text-white hover:bg-gray-700'
+          }`}
+        >
+          {isFollowingAuthor ? 'Following' : 'Follow'}
+        </button>
+      </div>
     </div>
   )
 }
