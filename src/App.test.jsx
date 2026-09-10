@@ -73,4 +73,16 @@ describe('App routing', () => {
     expect(container.querySelector('.bg-black\\/40')).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { level: 1, name: 'Profile' })).toBeInTheDocument()
   })
+
+  it('navigates to search results when a query is submitted from the sidebar', async () => {
+    const user = userEvent.setup()
+    renderApp('/')
+
+    await user.type(screen.getByRole('searchbox'), 'react hooks')
+    await user.keyboard('{Enter}')
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Results for "react hooks"' }),
+    ).toBeInTheDocument()
+  })
 })

@@ -8,10 +8,11 @@ import {
   BarChart2,
   Users,
   ChevronDown,
+  Search,
   X,
 } from 'lucide-react'
 import { useState } from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 
 const NAV_ITEMS = [
   { label: 'Home', path: '/', icon: Home, end: true },
@@ -77,7 +78,17 @@ export default function Sidebar({
   onClose = () => {},
 }) {
   const [showAllFollowing, setShowAllFollowing] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const visibleFollowing = showAllFollowing ? FOLLOWING : FOLLOWING.slice(0, 6)
+  const navigate = useNavigate()
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault()
+    const trimmed = searchQuery.trim()
+    if (!trimmed) return
+    navigate(`/search?q=${encodeURIComponent(trimmed)}`)
+    onClose()
+  }
 
   return (
     <>
@@ -95,8 +106,26 @@ export default function Sidebar({
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
+        {/* Search */}
+        <form role="search" onSubmit={handleSearchSubmit} className="px-5 pt-6">
+          <label htmlFor="sidebar-search" className="sr-only">
+            Search
+          </label>
+          <div className="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-2 text-gray-500 focus-within:ring-2 focus-within:ring-gray-300">
+            <Search size={16} className="shrink-0" />
+            <input
+              id="sidebar-search"
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search"
+              className="w-full bg-transparent text-sm text-gray-800 placeholder:text-gray-500 focus:outline-none"
+            />
+          </div>
+        </form>
+
         {/* Top actions */}
-        <div className="flex items-center justify-between px-5 pt-6 pb-2">
+        <div className="flex items-center justify-between px-5 pt-4 pb-2">
           <button
             type="button"
             className="flex items-center gap-2 text-gray-500 transition-colors hover:text-gray-900"

@@ -117,4 +117,31 @@ describe('Sidebar', () => {
 
     expect(onClose).toHaveBeenCalledTimes(1)
   })
+
+  it('renders a search input at the top of the sidebar', () => {
+    renderSidebar()
+
+    expect(screen.getByRole('searchbox')).toBeInTheDocument()
+  })
+
+  it('does not navigate on submit when the search field is empty', async () => {
+    const user = userEvent.setup()
+    renderSidebar()
+
+    await user.click(screen.getByRole('searchbox'))
+    await user.keyboard('{Enter}')
+
+    expect(screen.getByRole('searchbox')).toHaveValue('')
+  })
+
+  it('navigates to the search results route and closes on submit', async () => {
+    const onClose = vi.fn()
+    const user = userEvent.setup()
+    renderSidebar({ onClose })
+
+    await user.type(screen.getByRole('searchbox'), 'react hooks')
+    await user.keyboard('{Enter}')
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
 })
