@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { PUBLICATIONS as FOLLOWING } from '../data/searchIndex'
 
 const NAV_ITEMS = [
   { label: 'Home', path: '/', icon: Home, end: true },
@@ -21,19 +22,6 @@ const NAV_ITEMS = [
   { label: 'Stories', path: '/stories', icon: Newspaper },
   { label: 'Stats', path: '/stats', icon: BarChart2 },
   { label: 'Following', path: '/following', icon: Users },
-]
-
-const FOLLOWING = [
-  'Sensual: An Erotic Life',
-  'Generative AI',
-  'Entrepreneurship Handbook',
-  'Towards AI',
-  'Jano le Roux',
-  'Data Science Collective',
-  'AI Advances',
-  'Everyday AI',
-  'AI Mind',
-  'MLGuy',
 ]
 
 const FOOTER_LINKS = [
